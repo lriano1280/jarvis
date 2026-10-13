@@ -1,0 +1,14 @@
+# Variables de entorno
+.env
+.env.*
+
+# Credenciales
+*credentials*.json
+*secrets*.json
+
+# Python
+__pycache__/
+.venv/
+
+# Claude
+.claude/settings.local.json
