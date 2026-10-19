@@ -7,6 +7,6 @@ def hola(nombre: str = "mundo"):
     return {"mensaje": f"hola {nombre}"}
 
 
-@app.get("/salud")
+@app.get("/health")
 def salud():
     return {"estado": "ok"}
