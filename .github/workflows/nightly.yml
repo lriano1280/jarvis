@@ -11,19 +11,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Descargar el repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Configurar Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # 3. Instalar dependencias
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install duckdb pandas pyarrow
 
+      # 4. Descargar el Parquet
       - name: Download NYC Taxi Parquet
         run: |
           mkdir -p m1/data
@@ -31,10 +35,27 @@ jobs:
             -o m1/data/yellow_tripdata_2025-01.parquet \
             https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-01.parquet
 
+      # 5. Ejecutar query.py desde m1
       - name: Run DuckDB analysis
         working-directory: m1
         run: python query.py
 
+      # 6. Verificar que se haya generado el CSV
+      - name: Check generated files
+        run: |
+          echo "Contenido de m1:"
+          ls -lah m1/
+
+          echo "Buscando archivos CSV:"
+          find . -name "*.csv"
+
+          echo "Verificando resultado.csv:"
+          test -f m1/resultado.csv
+
+          echo "Contenido del CSV:"
+          head -n 5 m1/resultado.csv
+
+      # 7. Subir el CSV como artifact
       - name: Upload CSV artifact
         uses: actions/upload-artifact@v4
         with:
