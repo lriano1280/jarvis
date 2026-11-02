@@ -1,0 +1,21 @@
+name: nightly
+on:
+  schedule:
+    - cron: "0 6 * * *"      # todos los días a las 06:00 UTC
+  workflow_dispatch:          # permite lanzarlo a mano
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install duckdb
+      - run: curl -L -o data.parquet "TU_URL_AQUI"   # cámbialo según el paso 2
+      - run: python m1/query.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resultado
+          path: m1/resultado.csv
