@@ -1,21 +1,40 @@
-name: nightly
+
+name: Nightly Taxi Analysis
+
 on:
   schedule:
-    - cron: "0 6 * * *"      # todos los días a las 06:00 UTC
-  workflow_dispatch:          # permite lanzarlo a mano
+    - cron: "0 6 * * *"
+  workflow_dispatch:
 
 jobs:
-  run:
+  analyze:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: pip install duckdb
-      - run: curl -L -o data.parquet "TU_URL_AQUI"   # cámbialo según el paso 2
-      - run: python m1/query.py
-      - uses: actions/upload-artifact@v4
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install duckdb pandas pyarrow
+
+      - name: Descargar Parquet
+        run: |
+          mkdir -p m1/data
+          curl -L --fail \
+            -o m1/data/yellow_tripdata_2025-01.parquet \
+            https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-01.parquet
+
+      - name: Ejecutar análisis
+        working-directory: m1
+        run: python query.py
+
+      - name: Guardar CSV como artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: resultado
+          name: resultado-taxi
           path: m1/resultado.csv
